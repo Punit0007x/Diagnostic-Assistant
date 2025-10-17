@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MDDA: Patient Directory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #f5f3ff; /* Light purple */
+      --bg-2: #eff6ff; /* Light blue */
+      --surface: #ffffff;
+      --muted: #6b7280; /* gray-500 */
+      --text: #111827; /* gray-900 */
+      --accent: #6366f1; /* indigo-500 */
+      --accent-2: #4f46e5; /* indigo-600 */
+      --success: #10b981; /* emerald-500 */
+      --warning: #f59e0b; /* amber-500 */
+      --border: #e5e7eb; /* gray-200 */
+      --shadow: 0 6px 20px rgba(16,24,40,0.06);
+      --radius: 12px;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--bg-1), var(--bg-2));
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden; /* Prevent horizontal scroll from animations */
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .top-header {
+      background: linear-gradient(90deg, rgba(255,255,255,0.85), rgba(255,255,255,0.9));
+      border-bottom: 1px solid var(--border);
+      padding: 18px 28px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 6px 20px rgba(16,24,40,0.04);
+      backdrop-filter: blur(4px);
+    }
+
+    .top-header .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-shrink: 0; /* Prevent buttons from shrinking */
+    }
+
+    .top-header .logo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      box-shadow: 0 6px 18px rgba(6,182,212,0.12);
+    }
+
+    .top-header .logo svg {
+      width: 26px;
+      height: 26px;
+      display: block;
+    }
+
+    /* small logo pulse */
+    .top-header .logo { animation: pulse 6s ease-in-out infinite; }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.04); }
+    }
+
+    .top-header .title-wrap h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: var(--text);
+      font-weight: 800;
+      letter-spacing: 0.2px;
+    }
+
+    .top-header .title-wrap .tagline {
+      margin: 2px 0 0 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    /* CONTAINER */
+    .container {
+      flex-grow: 1;
+      padding: 32px 6%;
+    }
+
+    /* CONTROLS BAR */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .controls-bar .search-wrapper {
+      position: relative;
+      flex-grow: 1;
+    }
+
+    .controls-bar .search-wrapper input {
+      width: 100%;
+      padding-left: 40px;
+      box-sizing: border-box;
+    }
+
+    .controls-bar .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 16px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .controls-bar label {
+      font-weight: 600;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-size: 0.75rem;
+    }
+
+    .controls-bar input,
+    .controls-bar select {
+      flex-grow: 1;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #fafbfd;
+      color: var(--text);
+      font-size: 1rem;
+      transition: box-shadow 0.15s ease, border-color 0.15s ease;
+    }
+
+    .controls-bar input:focus,
+    .controls-bar select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 4px 14px rgba(37,99,235,0.12);
+      outline: none;
+    }
+
+    /* TABLE CONTAINER */
+    .patient-table-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-top: 22px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .patient-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .patient-table thead {
+      background: linear-gradient(90deg, #fbfdff, #f7fbff);
+    }
+    
+    .patient-table th {
+      text-align: left;
+      padding: 16px 18px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      font-size: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .patient-table th.avatar-col { width: 64px; }
+
+    .patient-table td {
+      padding: 16px 18px;
+      border-top: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 6px 18px rgba(6,182,212,0.08);
+    }
+    .patient-table tbody tr {
+      transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .patient-table tbody tr:nth-child(odd) {
+      background: #ffffff;
+    }
+
+    .patient-table tbody tr:nth-child(even) {
+      background: #fbfeff;
+    }
+
+    .patient-table tbody tr:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(6,182,212,0.06);
+      background: #f8ffff;
+    }
+
+    .row-actions { display: flex; gap: 8px; }
+
+    /* STATUS BADGES */
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 999px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+      font-size: 0.9rem;
+    }
+
+    .btn-primary-action {
+      background: var(--accent);
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+      border: none;
+      border-radius: 10px;
+      padding: 9px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary-action:hover,
+    .btn-primary-action:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+      outline: none;
+    }
+
+    .btn-secondary-action {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 16px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-secondary-action:hover,
+    .btn-secondary-action:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(100, 116, 139, 0.1);
+      outline: none;
+    }
+
+    /* Diagnosis Cell Styling */
+    .diagnosis-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .diagnosis-cell strong {
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .diagnosis-cell .diagnosis-details {
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+
+    /* Status Badge Enhancements */
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .status-badge::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status-ready {
+      background: rgba(16, 185, 129, 0.1); /* emerald/10 */
+      color: #047857; /* emerald-700 */
+    }
+
+    .status-ready::before {
+      background: var(--success);
+      box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2); /* emerald/20 */
+    }
+
+    .status-processing {
+      background: rgba(245, 158, 11, 0.1); /* amber/10 */
+      color: #b45309; /* amber-700 */
+    }
+
+    .status-processing::before {
+      background: var(--warning);
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2); /* amber/20 */
+      animation: pulse 1.5s infinite;
+    }
+
+    /* Action Buttons Container */
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* Avatar Enhancements */
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .avatar:hover {
+      transform: scale(1.1);
+    }
+
+    /* FOOTER */
+    .footer {
+      text-align: center;
+      padding: 20px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+      margin-top: 24px;
+    }
+
+    /* Sortable Table Headers */
+    .patient-table th.sortable {
+      cursor: pointer;
+      user-select: none;
+      position: relative;
+      transition: background-color 0.2s ease;
+    }
+    .patient-table th.sortable:hover {
+      background-color: #f0f9ff;
+    }
+    .patient-table th .sort-indicator {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--accent);
+    }
+
+    /* Search Highlighting */
+    .highlight {
+      background-color: #fef08a; /* yellow-200 */
+      border-radius: 3px;
+      padding: 0 2px;
+      font-weight: 600;
+      color: #713f12; /* amber-900 */
+    }
+
+    /* Focus Outline */
+    .controls-bar input:focus, .controls-bar select:focus, .table-action-button:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    /* Action Button for Toggling Status */
+    .btn-toggle-status {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid rgba(99, 102, 241, 0.4);
+    }
+    .btn-toggle-status:hover {
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    /* Row Animation */
+    .animate-row {
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- Responsive Design --- */
+    @media (max-width: 900px) {
+      .container {
+        padding: 24px 4%;
+      }
+
+      /* Convert table to card layout */
+      .patient-table thead {
+        display: none; /* Hide table headers on mobile */
+      }
+
+      .patient-table tbody, .patient-table tr {
+        display: block;
+      }
+
+      .patient-table tr {
+        margin-bottom: 1rem;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: none;
+        padding: 8px;
+      }
+
+      .patient-table tr:hover {
+        transform: none;
+        box-shadow: var(--shadow);
+      }
+
+      .patient-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 8px;
+        border: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .patient-table td:last-child {
+        border-bottom: none;
+      }
+
+      .patient-table td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--muted);
+        padding-right: 16px;
+      }
+
+      .patient-table .avatar-col { display: none; } /* Hide avatar column */
+
+      .controls-bar {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .top-header .header-inner {
+        flex-direction: column;
+        gap: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="top-header">
+    <div class="header-inner">
+      <div style="flex:1;display:flex;gap:14px;align-items:center;">
+        <div class="logo" aria-hidden="true">
+          <!-- simple medical cross SVG -->
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="9" y="3" width="6" height="18" rx="1" fill="white" opacity="0.95" />
+            <rect x="3" y="9" width="18" height="6" rx="1" fill="white" opacity="0.95" />
+          </svg>
+        </div>
+        <div class="title-wrap">
+          <h1>MDDA</h1>
+          <div class="tagline">Patient Directory • Insight at a glance</div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <a class="table-action-button btn-primary-action" href="add_patient.html">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          Add Patient
+        </a>
+        <a class="table-action-button btn-secondary-action" href="#">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Export CSV
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="controls-bar">
+      <label for="search">Search:</label>
+      <div class="search-wrapper">
+        <span class="search-icon" aria-hidden="true">🔍</span>
+        <input type="text" id="search" placeholder="Patient ID, Name, or Diagnosis..." />
+      </div>
+
+      <label for="status-filter">Status:</label>
+      <select id="status-filter">
+        <option value="">All Statuses</option>
+        <option value="Dashboard Ready">Dashboard Ready</option>
+        <option value="Processing">Processing</option>
+      </select>
+    </div>
+
+    <div class="patient-table-container">
+      <table class="patient-table">
+        <thead>
+          <tr>
+            <th class="avatar-col"></th>
+            <th class="sortable" data-column="1">Patient ID <span class="sort-indicator"></span></th>
+            <th class="sortable" data-column="2">Name <span class="sort-indicator"></span></th>
+            <th class="sortable" data-column="3" data-type="number">Age <span class="sort-indicator"></span></th>
+            <th class="sortable" data-column="4">Primary Diagnosis <span class="sort-indicator"></span></th>
+            <th class="sortable" data-column="5">Status <span class="sort-indicator"></span></th>
+            <th class="sortable" data-column="6">Last Activity <span class="sort-indicator"></span></th>
+            <th data-column="7">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-status="Dashboard Ready" class="animate-row" style="animation-delay: 0.1s;">
+            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #60a5fa, #3b82f6)">SK</div></td>
+            <td data-label="Patient ID">P-2025-001</td>
+            <td data-label="Name">Sarah Kim</td>
+            <td data-label="Age">54</td>
+            <td data-label="Diagnosis">
+              <div class="diagnosis-cell">
+                <strong>Hepatocellular Carcinoma</strong>
+                <span class="diagnosis-details">5.2cm tumor, Segment VI</span>
+              </div>
+            </td>
+            <td data-label="Status"><span class="status-badge status-ready">Analysis Complete</span></td>
+            <td data-label="Last Activity">Oct 15, 2025</td>
+            <td data-label="Actions" class="row-actions">
+              <div class="action-buttons">
+                <a href="dashboard_new.html?id=P-2025-001" class="table-action-button btn-primary-action">Report</a>
+                <button class="table-action-button btn-secondary-action" onclick="exportRecord('P-2025-001')">Export</button>
+              </div>
+            </td>
+          </tr>
+          <tr data-status="Processing" class="animate-row" style="animation-delay: 0.2s;">
+            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #f472b6, #f59e42)">RM</div></td>
+            <td data-label="Patient ID">P-2025-002</td>
+            <td data-label="Name">Robert Martinez</td>
+            <td data-label="Age">67</td>
+            <td data-label="Diagnosis">
+              <div class="diagnosis-cell">
+                <strong>NSCLC (Adenocarcinoma)</strong>
+                <span class="diagnosis-details">2.8cm RUL nodule, Stage IIB</span>
+              </div>
+            </td>
+            <td data-label="Status"><span class="status-badge status-processing">Processing</span></td>
+            <td data-label="Last Activity">Oct 16, 2025</td>
+            <td data-label="Actions" class="row-actions">
+              <div class="action-buttons">
+                <button class="table-action-button btn-toggle-status" onclick="toggleStatus(this)">Mark Ready</button>
+                <a href="dashboard_new.html?id=P-2025-002" class="table-action-button btn-primary-action" style="display: none;">Report</a>
+              </div>
+            </td>
+          </tr>
+          <tr data-status="Dashboard Ready" class="animate-row" style="animation-delay: 0.3s;">
+            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #34d399, #06b6d4)">EJ</div></td>
+            <td data-label="Patient ID">P-2025-003</td>
+            <td data-label="Name">Emily Johnson</td>
+            <td data-label="Age">42</td>
+            <td data-label="Diagnosis">
+              <div class="diagnosis-cell">
+                <strong>Breast Cancer</strong>
+                <span class="diagnosis-details">IDC, Grade II, T2N1M0</span>
+              </div>
+            </td>
+            <td data-label="Status"><span class="status-badge status-ready">Analysis Complete</span></td>
+            <td data-label="Last Activity">Oct 17, 2025</td>
+            <td data-label="Actions" class="row-actions">
+              <div class="action-buttons">
+                <a href="dashboard_new.html?id=P-2025-003" class="table-action-button btn-primary-action">Report</a>
+                <button class="table-action-button btn-secondary-action" onclick="exportRecord('P-2025-003')">Export</button>
+              </div>
+            </td>
+          </tr>
+          <tr data-status="Processing" class="animate-row" style="animation-delay: 0.4s;">
+            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #fbbf24, #f472b6)">AL</div></td>
+            <td data-label="Patient ID">P-2025-004</td>
+            <td data-label="Name">Amira Lee</td>
+            <td data-label="Age">29</td>
+            <td data-label="Diagnosis">
+              <div class="diagnosis-cell">
+                <strong>Type 1 Diabetes</strong>
+                <span class="diagnosis-details">HbA1c: 8.2%, Insulin Therapy</span>
+              </div>
+            </td>
+            <td data-label="Status"><span class="status-badge status-processing">Processing</span></td>
+            <td data-label="Last Activity">Oct 17, 2025</td>
+            <td data-label="Actions" class="row-actions">
+              <div class="action-buttons">
+                <button class="table-action-button btn-toggle-status" onclick="toggleStatus(this)">Mark Ready</button>
+                <a href="dashboard_new.html?id=P-2025-004" class="table-action-button btn-primary-action" style="display: none;">Report</a>
+              </div>
+            </td>
+          </tr>
+          <tr data-status="Dashboard Ready" class="animate-row" style="animation-delay: 0.5s;">
+            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #a78bfa, #f472b6)">JS</div></td>
+            <td data-label="Patient ID">P-2025-005</td>
+            <td data-label="Name">Jasper Singh</td>
+            <td data-label="Age">36</td>
+            <td data-label="Diagnosis">
+              <div class="diagnosis-cell">
+                <strong>Asthma</strong>
+                <span class="diagnosis-details">Mild persistent, Inhaler therapy</span>
+              </div>
+            </td>
+            <td data-label="Status"><span class="status-badge status-ready">Stable</span></td>
+            <td data-label="Last Activity">Oct 14, 2025</td>
+            <td data-label="Actions" class="row-actions">
+              <div class="action-buttons">
+                <a href="dashboard_new.html?id=P-2025-005" class="table-action-button btn-primary-action">Report</a>
+                <button class="table-action-button btn-secondary-action" onclick="exportRecord('P-2025-005')">Export</button>
+              </div>
+            </td>
+          </tr>
+          <tr data-status="Processing" class="animate-row" style="animation-delay: 0.6s;">
+            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #f472b6, #34d399)">MB</div></td>
+            <td data-label="Patient ID">P-2025-006</td>
+            <td data-label="Name">Maria Blanco</td>
+            <td data-label="Age">61</td>
+            <td data-label="Diagnosis">
+              <div class="diagnosis-cell">
+                <strong>Chronic Kidney Disease</strong>
+                <span class="diagnosis-details">Stage 3, eGFR: 45</span>
+              </div>
+            </td>
+            <td data-label="Status"><span class="status-badge status-processing">Processing</span></td>
+            <td data-label="Last Activity">Oct 13, 2025</td>
+            <td data-label="Actions" class="row-actions">
+              <div class="action-buttons">
+                <button class="table-action-button btn-toggle-status" onclick="toggleStatus(this)">Mark Ready</button>
+                <a href="dashboard_new.html?id=P-2025-006" class="table-action-button btn-primary-action" style="display: none;">Report</a>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">
+    MDDA © 2024. All rights reserved.
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const searchInput = document.getElementById("search");
+      const statusFilter = document.getElementById("status-filter");
+      const rows = Array.from(document.querySelectorAll(".patient-table tbody tr"));
+
+      function highlightText(text, query) {
+        if (!query) return text;
+        const regex = new RegExp(`(${query})`, 'gi');
+        return text.replace(regex, '<span class="highlight">$1</span>');
+      }
+
+      function clearHighlights() {
+        rows.forEach(row => {
+          for (let i = 1; i < row.cells.length - 1; i++) {
+            row.cells[i].innerHTML = row.cells[i].textContent;
+          }
+        });
+      }
+
+      function filterPatients() {
+        clearHighlights();
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedStatus = statusFilter.value;
+
+        rows.forEach((row) => {
+          const patientId = row.cells[1].textContent.toLowerCase();
+          const patientName = row.cells[2].textContent.toLowerCase();
+          const diagnosis = row.cells[4].textContent.toLowerCase();
+          const dataStatus = row.getAttribute("data-status");
+
+          const matchesSearch =
+            patientId.includes(searchTerm) ||
+            patientName.includes(searchTerm) ||
+            diagnosis.includes(searchTerm);
+          const matchesStatus = selectedStatus === "" || dataStatus.toLowerCase().includes(selectedStatus.toLowerCase());
+
+          if (matchesSearch && matchesStatus) {
+            row.style.display = "";
+            if (searchTerm) {
+              row.cells[1].innerHTML = highlightText(row.cells[1].textContent, searchInput.value);
+              row.cells[2].innerHTML = highlightText(row.cells[2].textContent, searchInput.value);
+              row.cells[4].innerHTML = highlightText(row.cells[4].textContent, searchInput.value);
+            }
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      searchInput.addEventListener("input", filterPatients);
+      statusFilter.addEventListener("change", filterPatients);
+
+      // --- Sorting Logic ---
+      document.querySelectorAll('.patient-table th.sortable').forEach(header => {
+        header.addEventListener('click', () => {
+          const table = header.closest('table');
+          const tbody = table.querySelector('tbody');
+          const columnIndex = parseInt(header.dataset.column);
+          const isNumeric = header.dataset.type === 'number';
+          const currentDirection = header.dataset.sortDir || 'desc';
+          const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+
+          // Reset other headers
+          table.querySelectorAll('th.sortable').forEach(h => {
+            h.dataset.sortDir = '';
+            h.querySelector('.sort-indicator').textContent = '';
+          });
+
+          // Set current header
+          header.dataset.sortDir = newDirection;
+          header.querySelector('.sort-indicator').textContent = newDirection === 'asc' ? ' ▲' : ' ▼';
+
+          Array.from(tbody.querySelectorAll('tr'))
+            .sort((a, b) => {
+              let valA = a.cells[columnIndex].textContent.trim();
+              let valB = b.cells[columnIndex].textContent.trim();
+
+              if (isNumeric) {
+                valA = parseFloat(valA) || 0;
+                valB = parseFloat(valB) || 0;
+              }
+
+              if (valA < valB) return newDirection === 'asc' ? -1 : 1;
+              if (valA > valB) return newDirection === 'asc' ? 1 : -1;
+              return 0;
+            })
+            .forEach(row => tbody.appendChild(row));
+        });
+      });
+
+      // --- Status Toggle ---
+      window.toggleStatus = function(button) {
+        const row = button.closest('tr');
+        const statusCell = row.cells[5];
+        const statusBadge = statusCell.querySelector('.status-badge');
+        const viewReportButton = row.querySelector('.btn-primary-action');
+
+        row.dataset.status = "Analysis Complete";
+        statusBadge.className = 'status-badge status-ready';
+        statusBadge.textContent = 'Analysis Complete';
+        button.style.display = 'none';
+        if(viewReportButton) viewReportButton.style.display = 'inline-block';
+      }
+
+      // --- Export Visible to CSV ---
+      const exportCsvButton = document.querySelector('.btn-secondary-action[href="#"]');
+      if (exportCsvButton) {
+        exportCsvButton.addEventListener('click', (e) => {
+          e.preventDefault();
+          const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
+          if (visibleRows.length === 0) {
+            alert("No visible patients to export.");
+            return;
+          }
+
+          const headers = Array.from(document.querySelectorAll('.patient-table th'))
+            .map(th => th.textContent.trim()).slice(1, -1); // Skip avatar and actions
+
+          let csvContent = "data:text/csv;charset=utf-8," + headers.join(",") + "\n";
+
+          visibleRows.forEach(row => {
+            const rowData = Array.from(row.cells).slice(1, -1).map(cell => `"${cell.textContent.trim()}"`);
+            csvContent += rowData.join(",") + "\n";
+          });
+
+          const encodedUri = encodeURI(csvContent);
+          const link = document.createElement("a");
+          link.setAttribute("href", encodedUri);
+          link.setAttribute("download", "visible_patients.csv");
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        });
+      }
+
+      // --- Mock Export Record ---
+      window.exportRecord = function(patientId) {
+        alert(`Exporting single record for patient: ${patientId}`);
+        // In a real app, this would trigger a download of a single record's data.
+      }
+    });
+  </script>
+</body>
+</html>
