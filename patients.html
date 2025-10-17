@@ -845,8 +845,8 @@
           if (!existingDB || Object.keys(JSON.parse(existingDB)).length === 0) {
               console.log("No patient data found. Initializing with demo patients.");
               const demoPatientData = {
-                  'P-2025-001': {
-                      id: 'P-2025-001', name: 'Sarah Kim', initials: 'SK', age: 54, gender: 'Female', bloodType: 'A+', height: '165 cm', weight: '62 kg',
+                  'P-2025-001': { // Changed name
+                      id: 'P-2025-001', name: 'Priya Sharma', initials: 'PS', age: 54, gender: 'Female', bloodType: 'A+', height: '165 cm', weight: '62 kg',
                       analysisStatus: 'complete',
                       diagnosis: {
                           condition: 'Hepatocellular Carcinoma', details: '5.2cm tumor, Segment VI', date: 'Sept 28, 2025',
@@ -860,9 +860,9 @@
                           treatment: 'Surgical resection planned',
                           treatmentPlan: { medications: [ { name: 'Lactulose', dosage: '30ml PO BID', purpose: 'To prevent hepatic encephalopathy' }, { name: 'Vitamin K', dosage: '10mg IV daily', purpose: 'To correct coagulopathy pre-op' } ], consultations: [ { specialty: 'Surgical Oncology', date: 'Oct 15, 2025', status: 'Completed' }, { specialty: 'Anesthesiology', date: 'Oct 18, 2025', status: 'Scheduled' } ], monitoring: ['Weekly LFTs and coagulation profile', 'Monitor for signs of ascites or edema', 'Post-op imaging at 1 and 3 months'] }
                       }
-                  },
-                  'P-2025-002': {
-                      id: 'P-2025-002', name: 'Robert Martinez', initials: 'RM', age: 67, gender: 'Male', bloodType: 'O-', height: '178 cm', weight: '85 kg',
+                  }, // End of P-2025-001
+                  'P-2025-002': { // Changed name
+                      id: 'P-2025-002', name: 'Rohan Mehta', initials: 'RM', age: 67, gender: 'Male', bloodType: 'O-', height: '178 cm', weight: '85 kg',
                       analysisStatus: 'processing',
                       diagnosis: {
                           condition: 'NSCLC (Adenocarcinoma)', details: '2.8cm RUL nodule, Stage IIB', date: 'Oct 02, 2025',
@@ -876,9 +876,9 @@
                           treatment: 'Chemotherapy (Cisplatin/Pemetrexed)',
                           treatmentPlan: { medications: [ { name: 'Cisplatin', dosage: '75 mg/m²', purpose: 'Cycle 1 of 4' }, { name: 'Pemetrexed', dosage: '500 mg/m²', purpose: 'Cycle 1 of 4' }, { name: 'Ondansetron', dosage: '8mg PO PRN', purpose: 'For nausea' } ], consultations: [ { specialty: 'Radiation Oncology', date: 'Oct 25, 2025', status: 'Scheduled' } ], monitoring: ['Monitor CBC and renal function before each cycle', 'Follow-up CT scan after 2 cycles to assess response'] }
                       }
-                  },
-                  'P-2025-003': {
-                      id: 'P-2025-003', name: 'Emily Johnson', initials: 'EJ', age: 42, gender: 'Female', bloodType: 'B+', height: '160 cm', weight: '58 kg',
+                  }, // End of P-2025-002
+                  'P-2025-003': { // Changed name
+                      id: 'P-2025-003', name: 'Anjali Gupta', initials: 'AG', age: 42, gender: 'Female', bloodType: 'B+', height: '160 cm', weight: '58 kg',
                       analysisStatus: 'complete',
                       diagnosis: {
                           condition: 'Breast Cancer', details: 'IDC, Grade II, T2N1M0', date: 'Aug 15, 2025',
@@ -892,9 +892,9 @@
                           treatment: 'Lumpectomy followed by radiation and hormone therapy',
                           treatmentPlan: { medications: [ { name: 'Tamoxifen', dosage: '20mg PO daily', purpose: 'Adjuvant hormone therapy' } ], consultations: [ { specialty: 'Radiation Oncology', date: 'Sep 10, 2025', status: 'Completed' }, { specialty: 'Medical Oncology', date: 'Sep 15, 2025', status: 'Completed' } ], monitoring: ['Annual mammogram', 'Regular follow-up with medical oncology'] }
                       }
-                  },
-                  'P-2025-004': {
-                      id: 'P-2025-004', name: 'Amira Lee', initials: 'AL', age: 29, gender: 'Female', bloodType: 'AB+', height: '170 cm', weight: '65 kg',
+                  }, // End of P-2025-003
+                  'P-2025-004': { // Changed name and gender
+                      id: 'P-2025-004', name: 'Aarav Patel', initials: 'AP', age: 29, gender: 'Male', bloodType: 'AB+', height: '170 cm', weight: '65 kg',
                       analysisStatus: 'processing',
                       diagnosis: {
                           condition: 'Type 1 Diabetes', details: 'HbA1c: 8.2%, Insulin Therapy', date: 'Jan 20, 2024',
@@ -908,9 +908,9 @@
                           treatment: 'Insulin pump therapy and continuous glucose monitoring',
                           treatmentPlan: { medications: [ { name: 'Insulin Aspart', dosage: 'Via pump, variable', purpose: 'Basal and bolus insulin' } ], consultations: [ { specialty: 'Endocrinologist', date: 'Nov 05, 2024', status: 'Scheduled' }, { specialty: 'Registered Dietitian', date: 'Nov 12, 2024', status: 'Scheduled' } ], monitoring: ['Review CGM data weekly', 'Quarterly HbA1c checks', 'Annual kidney and eye screening'] }
                       }
-                  },
-                  'P-2025-005': {
-                      id: 'P-2025-005', name: 'Jasper Singh', initials: 'JS', age: 36, gender: 'Male', bloodType: 'O+', height: '182 cm', weight: '78 kg',
+                  }, // End of P-2025-004
+                  'P-2025-005': { // Changed name
+                      id: 'P-2025-005', name: 'Vikram Rathore', initials: 'VR', age: 36, gender: 'Male', bloodType: 'O+', height: '182 cm', weight: '78 kg',
                       analysisStatus: 'complete',
                       diagnosis: {
                           condition: 'Asthma', details: 'Mild persistent, Inhaler therapy', date: 'Mar 10, 2023',
@@ -924,9 +924,9 @@
                           treatment: 'Albuterol inhaler (as needed), Fluticasone (daily)',
                           treatmentPlan: { medications: [ { name: 'Fluticasone', dosage: '1 puff BID', purpose: 'Controller medication' }, { name: 'Albuterol', dosage: '2 puffs PRN', purpose: 'Rescue medication' } ], consultations: [ { specialty: 'Pulmonology', date: 'Mar 10, 2024', status: 'Completed' } ], monitoring: ['Annual spirometry testing', 'Review inhaler technique at each visit'] }
                       }
-                  },
-                  'P-2025-006': {
-                      id: 'P-2025-006', name: 'Maria Blanco', initials: 'MB', age: 61, gender: 'Female', bloodType: 'A-', height: '155 cm', weight: '70 kg',
+                  }, // End of P-2025-005
+                  'P-2025-006': { // Changed name
+                      id: 'P-2025-006', name: 'Sunita Desai', initials: 'SD', age: 61, gender: 'Female', bloodType: 'A-', height: '155 cm', weight: '70 kg',
                       analysisStatus: 'processing',
                       diagnosis: {
                           condition: 'Chronic Kidney Disease', details: 'Stage 3, eGFR: 45', date: 'Jul 22, 2025',
@@ -940,9 +940,9 @@
                           treatment: 'Lisinopril for blood pressure control, dietary restrictions',
                           treatmentPlan: { medications: [ { name: 'Lisinopril', dosage: '20mg PO daily', purpose: 'Blood pressure & renal protection' }, { name: 'Atorvastatin', dosage: '40mg PO daily', purpose: 'Cardiovascular risk reduction' } ], consultations: [ { specialty: 'Nephrology', date: 'Oct 20, 2025', status: 'Scheduled' }, { specialty: 'Renal Dietitian', date: 'Aug 10, 2025', status: 'Completed' } ], monitoring: ['Monitor eGFR and electrolytes every 3 months', 'Maintain BP < 130/80 mmHg'] }
                       }
-                  },
-                  'P-2025-007': {
-                      id: 'P-2025-007', name: 'David Chen', initials: 'DC', age: 48, gender: 'Male', bloodType: 'B-', height: '175 cm', weight: '72 kg',
+                  }, // End of P-2025-006
+                  'P-2025-007': { // Changed name
+                      id: 'P-2025-007', name: 'Arjun Kumar', initials: 'AK', age: 48, gender: 'Male', bloodType: 'B-', height: '175 cm', weight: '72 kg',
                       analysisStatus: 'complete',
                       diagnosis: {
                           condition: 'Glioblastoma', details: '4.5cm mass in left temporal lobe', date: 'Oct 18, 2025',
@@ -956,7 +956,7 @@
                           treatment: 'Surgical Resection + Chemoradiation',
                           treatmentPlan: { medications: [ { name: 'Dexamethasone', dosage: '4mg PO QID', purpose: 'To reduce cerebral edema' }, { name: 'Levetiracetam', dosage: '500mg PO BID', purpose: 'Seizure prophylaxis' } ], consultations: [ { specialty: 'Neurosurgery', date: 'Oct 19, 2025', status: 'Completed' }, { specialty: 'Neuro-Oncology', date: 'Oct 22, 2025', status: 'Scheduled' } ], monitoring: ['Weekly CBC during chemotherapy', 'MRI brain every 2 months post-treatment'] }
                       }
-                  },
+                  }, // End of P-2025-007
               };
               localStorage.setItem(PATIENT_DB_KEY, JSON.stringify(demoPatientData));
           }
