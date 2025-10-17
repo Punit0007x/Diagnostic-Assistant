@@ -165,6 +165,39 @@
       outline: none;
     }
 
+    /* NEW CARD-BASED LAYOUT */
+    .patient-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .patient-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .patient-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 25px rgba(16,24,40,0.08);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
     /* TABLE CONTAINER */
     .patient-table-container {
       background: var(--surface);
@@ -426,6 +459,14 @@
       background: rgba(99, 102, 241, 0.1);
     }
 
+    /* Delete Button */
+    .btn-delete-action {
+      background: transparent;
+      color: #ef4444; /* red-500 */
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+    .btn-delete-action:hover { background: rgba(239, 68, 68, 0.1); }
+
     /* Row Animation */
     .animate-row {
       opacity: 0;
@@ -439,6 +480,42 @@
       }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* Confirmation Modal */
+    .modal-backdrop {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(30, 41, 59, 0.8);
+        backdrop-filter: blur(4px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 1000; opacity: 0; visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+    .modal-backdrop.visible { opacity: 1; visibility: visible; }
+    .modal-container {
+        background: var(--surface); padding: 2rem; border-radius: var(--radius);
+        width: 90%; max-width: 500px; box-shadow: var(--shadow);
+        transform: scale(0.95); transition: transform 0.3s ease;
+    }
+    .modal-backdrop.visible .modal-container { transform: scale(1); }
+    .modal-title {
+        font-size: 1.5rem; font-weight: 700; color: var(--text); margin-bottom: 1rem;
+    }
+    .modal-content { color: var(--muted); margin-bottom: 1.5rem; }
+    .modal-actions { display: flex; gap: 1rem; }
+    .modal-button {
+        flex-grow: 1; padding: 0.75rem; border-radius: 8px;
+        font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+    }
+    .modal-button-confirm {
+        background-color: #dc2626; /* red-600 */
+        color: white; border: none;
+    }
+    .modal-button-confirm:hover { background-color: #b91c1c; }
+    .modal-button-cancel {
+        background-color: #e5e7eb; /* gray-200 */
+        color: #374151; /* gray-700 */ border: none;
+    }
+    .modal-button-cancel:hover { background-color: #d1d5db; }
 
     /* --- Responsive Design --- */
     @media (max-width: 900px) {
@@ -547,145 +624,18 @@
         <option value="Dashboard Ready">Dashboard Ready</option>
         <option value="Processing">Processing</option>
       </select>
+
+      <label for="sort-by">Sort By:</label>
+      <select id="sort-by">
+        <option value="name-asc">Name (A-Z)</option>
+        <option value="name-desc">Name (Z-A)</option>
+        <option value="age-asc">Age (Youngest First)</option>
+        <option value="age-desc">Age (Oldest First)</option>
+      </select>
     </div>
 
-    <div class="patient-table-container">
-      <table class="patient-table">
-        <thead>
-          <tr>
-            <th class="avatar-col"></th>
-            <th class="sortable" data-column="1">Patient ID <span class="sort-indicator"></span></th>
-            <th class="sortable" data-column="2">Name <span class="sort-indicator"></span></th>
-            <th class="sortable" data-column="3" data-type="number">Age <span class="sort-indicator"></span></th>
-            <th class="sortable" data-column="4">Primary Diagnosis <span class="sort-indicator"></span></th>
-            <th class="sortable" data-column="5">Status <span class="sort-indicator"></span></th>
-            <th class="sortable" data-column="6">Last Activity <span class="sort-indicator"></span></th>
-            <th data-column="7">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr data-status="Dashboard Ready" class="animate-row" style="animation-delay: 0.1s;">
-            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #60a5fa, #3b82f6)">SK</div></td>
-            <td data-label="Patient ID">P-2025-001</td>
-            <td data-label="Name">Sarah Kim</td>
-            <td data-label="Age">54</td>
-            <td data-label="Diagnosis">
-              <div class="diagnosis-cell">
-                <strong>Hepatocellular Carcinoma</strong>
-                <span class="diagnosis-details">5.2cm tumor, Segment VI</span>
-              </div>
-            </td>
-            <td data-label="Status"><span class="status-badge status-ready">Analysis Complete</span></td>
-            <td data-label="Last Activity">Oct 15, 2025</td>
-            <td data-label="Actions" class="row-actions">
-              <div class="action-buttons">
-                <a href="dashboard_new.html?id=P-2025-001" class="table-action-button btn-primary-action">Report</a>
-                <button class="table-action-button btn-secondary-action" onclick="exportRecord('P-2025-001')">Export</button>
-              </div>
-            </td>
-          </tr>
-          <tr data-status="Processing" class="animate-row" style="animation-delay: 0.2s;">
-            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #f472b6, #f59e42)">RM</div></td>
-            <td data-label="Patient ID">P-2025-002</td>
-            <td data-label="Name">Robert Martinez</td>
-            <td data-label="Age">67</td>
-            <td data-label="Diagnosis">
-              <div class="diagnosis-cell">
-                <strong>NSCLC (Adenocarcinoma)</strong>
-                <span class="diagnosis-details">2.8cm RUL nodule, Stage IIB</span>
-              </div>
-            </td>
-            <td data-label="Status"><span class="status-badge status-processing">Processing</span></td>
-            <td data-label="Last Activity">Oct 16, 2025</td>
-            <td data-label="Actions" class="row-actions">
-              <div class="action-buttons">
-                <button class="table-action-button btn-toggle-status" onclick="toggleStatus(this)">Mark Ready</button>
-                <a href="dashboard_new.html?id=P-2025-002" class="table-action-button btn-primary-action" style="display: none;">Report</a>
-              </div>
-            </td>
-          </tr>
-          <tr data-status="Dashboard Ready" class="animate-row" style="animation-delay: 0.3s;">
-            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #34d399, #06b6d4)">EJ</div></td>
-            <td data-label="Patient ID">P-2025-003</td>
-            <td data-label="Name">Emily Johnson</td>
-            <td data-label="Age">42</td>
-            <td data-label="Diagnosis">
-              <div class="diagnosis-cell">
-                <strong>Breast Cancer</strong>
-                <span class="diagnosis-details">IDC, Grade II, T2N1M0</span>
-              </div>
-            </td>
-            <td data-label="Status"><span class="status-badge status-ready">Analysis Complete</span></td>
-            <td data-label="Last Activity">Oct 17, 2025</td>
-            <td data-label="Actions" class="row-actions">
-              <div class="action-buttons">
-                <a href="dashboard_new.html?id=P-2025-003" class="table-action-button btn-primary-action">Report</a>
-                <button class="table-action-button btn-secondary-action" onclick="exportRecord('P-2025-003')">Export</button>
-              </div>
-            </td>
-          </tr>
-          <tr data-status="Processing" class="animate-row" style="animation-delay: 0.4s;">
-            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #fbbf24, #f472b6)">AL</div></td>
-            <td data-label="Patient ID">P-2025-004</td>
-            <td data-label="Name">Amira Lee</td>
-            <td data-label="Age">29</td>
-            <td data-label="Diagnosis">
-              <div class="diagnosis-cell">
-                <strong>Type 1 Diabetes</strong>
-                <span class="diagnosis-details">HbA1c: 8.2%, Insulin Therapy</span>
-              </div>
-            </td>
-            <td data-label="Status"><span class="status-badge status-processing">Processing</span></td>
-            <td data-label="Last Activity">Oct 17, 2025</td>
-            <td data-label="Actions" class="row-actions">
-              <div class="action-buttons">
-                <button class="table-action-button btn-toggle-status" onclick="toggleStatus(this)">Mark Ready</button>
-                <a href="dashboard_new.html?id=P-2025-004" class="table-action-button btn-primary-action" style="display: none;">Report</a>
-              </div>
-            </td>
-          </tr>
-          <tr data-status="Dashboard Ready" class="animate-row" style="animation-delay: 0.5s;">
-            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #a78bfa, #f472b6)">JS</div></td>
-            <td data-label="Patient ID">P-2025-005</td>
-            <td data-label="Name">Jasper Singh</td>
-            <td data-label="Age">36</td>
-            <td data-label="Diagnosis">
-              <div class="diagnosis-cell">
-                <strong>Asthma</strong>
-                <span class="diagnosis-details">Mild persistent, Inhaler therapy</span>
-              </div>
-            </td>
-            <td data-label="Status"><span class="status-badge status-ready">Stable</span></td>
-            <td data-label="Last Activity">Oct 14, 2025</td>
-            <td data-label="Actions" class="row-actions">
-              <div class="action-buttons">
-                <a href="dashboard_new.html?id=P-2025-005" class="table-action-button btn-primary-action">Report</a>
-                <button class="table-action-button btn-secondary-action" onclick="exportRecord('P-2025-005')">Export</button>
-              </div>
-            </td>
-          </tr>
-          <tr data-status="Processing" class="animate-row" style="animation-delay: 0.6s;">
-            <td class="avatar-col"><div class="avatar" style="background: linear-gradient(135deg, #f472b6, #34d399)">MB</div></td>
-            <td data-label="Patient ID">P-2025-006</td>
-            <td data-label="Name">Maria Blanco</td>
-            <td data-label="Age">61</td>
-            <td data-label="Diagnosis">
-              <div class="diagnosis-cell">
-                <strong>Chronic Kidney Disease</strong>
-                <span class="diagnosis-details">Stage 3, eGFR: 45</span>
-              </div>
-            </td>
-            <td data-label="Status"><span class="status-badge status-processing">Processing</span></td>
-            <td data-label="Last Activity">Oct 13, 2025</td>
-            <td data-label="Actions" class="row-actions">
-              <div class="action-buttons">
-                <button class="table-action-button btn-toggle-status" onclick="toggleStatus(this)">Mark Ready</button>
-                <a href="dashboard_new.html?id=P-2025-006" class="table-action-button btn-primary-action" style="display: none;">Report</a>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div id="patient-grid" class="patient-grid">
+      <!-- Patient cards will be dynamically inserted here -->
     </div>
   </div>
 
@@ -693,11 +643,24 @@
     MDDA © 2024. All rights reserved.
   </div>
 
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-confirm-modal" class="modal-backdrop">
+    <div class="modal-container">
+        <h3 class="modal-title">Confirm Deletion</h3>
+        <p id="delete-modal-content" class="modal-content">Are you sure you want to permanently delete this patient record? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button id="cancel-delete-btn" class="modal-button modal-button-cancel">Cancel</button>
+            <button id="confirm-delete-btn" class="modal-button modal-button-confirm">Delete Patient</button>
+        </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       const searchInput = document.getElementById("search");
       const statusFilter = document.getElementById("status-filter");
-      const rows = Array.from(document.querySelectorAll(".patient-table tbody tr"));
+      const sortBy = document.getElementById("sort-by");
+      let patientCards = []; // Will be populated dynamically
 
       function highlightText(text, query) {
         if (!query) return text;
@@ -706,10 +669,10 @@
       }
 
       function clearHighlights() {
-        rows.forEach(row => {
-          for (let i = 1; i < row.cells.length - 1; i++) {
-            row.cells[i].innerHTML = row.cells[i].textContent;
-          }
+        patientCards.forEach(card => {
+          card.querySelectorAll('.searchable').forEach(el => {
+            el.innerHTML = el.dataset.originalText;
+          });
         });
       }
 
@@ -718,27 +681,27 @@
         const searchTerm = searchInput.value.toLowerCase();
         const selectedStatus = statusFilter.value;
 
-        rows.forEach((row) => {
-          const patientId = row.cells[1].textContent.toLowerCase();
-          const patientName = row.cells[2].textContent.toLowerCase();
-          const diagnosis = row.cells[4].textContent.toLowerCase();
-          const dataStatus = row.getAttribute("data-status");
+        patientCards.forEach((card) => {
+          const patientId = card.dataset.patientId.toLowerCase();
+          const patientName = card.dataset.patientName.toLowerCase();
+          const diagnosis = card.dataset.diagnosis.toLowerCase();
+          const dataStatus = card.dataset.status;
 
           const matchesSearch =
             patientId.includes(searchTerm) ||
             patientName.includes(searchTerm) ||
             diagnosis.includes(searchTerm);
-          const matchesStatus = selectedStatus === "" || dataStatus.toLowerCase().includes(selectedStatus.toLowerCase());
+          const matchesStatus = !selectedStatus || dataStatus.toLowerCase().includes(selectedStatus.toLowerCase());
 
           if (matchesSearch && matchesStatus) {
-            row.style.display = "";
+            card.style.display = "";
             if (searchTerm) {
-              row.cells[1].innerHTML = highlightText(row.cells[1].textContent, searchInput.value);
-              row.cells[2].innerHTML = highlightText(row.cells[2].textContent, searchInput.value);
-              row.cells[4].innerHTML = highlightText(row.cells[4].textContent, searchInput.value);
+              card.querySelectorAll('.searchable').forEach(el => {
+                el.innerHTML = highlightText(el.dataset.originalText, searchTerm);
+              });
             }
           } else {
-            row.style.display = "none";
+            card.style.display = "none";
           }
         });
       }
@@ -747,61 +710,61 @@
       statusFilter.addEventListener("change", filterPatients);
 
       // --- Sorting Logic ---
-      document.querySelectorAll('.patient-table th.sortable').forEach(header => {
-        header.addEventListener('click', () => {
-          const table = header.closest('table');
-          const tbody = table.querySelector('tbody');
-          const columnIndex = parseInt(header.dataset.column);
-          const isNumeric = header.dataset.type === 'number';
-          const currentDirection = header.dataset.sortDir || 'desc';
-          const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+      sortBy.addEventListener('change', () => {
+        const grid = document.getElementById('patient-grid');
+        const [key, direction] = sortBy.value.split('-');
 
-          // Reset other headers
-          table.querySelectorAll('th.sortable').forEach(h => {
-            h.dataset.sortDir = '';
-            h.querySelector('.sort-indicator').textContent = '';
-          });
+        const sortedCards = [...patientCards].sort((a, b) => {
+          let valA = a.dataset[key];
+          let valB = b.dataset[key];
 
-          // Set current header
-          header.dataset.sortDir = newDirection;
-          header.querySelector('.sort-indicator').textContent = newDirection === 'asc' ? ' ▲' : ' ▼';
+          if (key === 'age') {
+            valA = parseInt(valA, 10);
+            valB = parseInt(valB, 10);
+          }
 
-          Array.from(tbody.querySelectorAll('tr'))
-            .sort((a, b) => {
-              let valA = a.cells[columnIndex].textContent.trim();
-              let valB = b.cells[columnIndex].textContent.trim();
-
-              if (isNumeric) {
-                valA = parseFloat(valA) || 0;
-                valB = parseFloat(valB) || 0;
-              }
-
-              if (valA < valB) return newDirection === 'asc' ? -1 : 1;
-              if (valA > valB) return newDirection === 'asc' ? 1 : -1;
-              return 0;
-            })
-            .forEach(row => tbody.appendChild(row));
+          if (valA < valB) return direction === 'asc' ? -1 : 1;
+          if (valA > valB) return direction === 'asc' ? 1 : -1;
+          return 0;
         });
+
+        sortedCards.forEach(card => grid.appendChild(card));
       });
+
+      loadPatients(); // Load patients from localStorage
 
       // --- Status Toggle ---
       window.toggleStatus = function(button) {
-        const row = button.closest('tr');
-        const statusCell = row.cells[5];
+        const card = button.closest('.patient-card');
+        const patientId = card.dataset.patientId;
+        const statusCell = card.querySelector('.card-footer');
         const statusBadge = statusCell.querySelector('.status-badge');
-        const viewReportButton = row.querySelector('.btn-primary-action');
+        const viewReportButton = card.querySelector('.btn-primary-action');
 
-        row.dataset.status = "Analysis Complete";
+        // Update UI
+        card.dataset.status = "Dashboard Ready";
         statusBadge.className = 'status-badge status-ready';
         statusBadge.textContent = 'Analysis Complete';
         button.style.display = 'none';
-        if(viewReportButton) viewReportButton.style.display = 'inline-block';
+        if(viewReportButton) viewReportButton.style.display = 'inline-flex';
+
+        // Update localStorage
+        const PATIENT_DB_KEY = 'mddaPatientDatabase';
+        try {
+            const patientDB = JSON.parse(localStorage.getItem(PATIENT_DB_KEY) || '{}');
+            if (patientDB[patientId]) {
+                patientDB[patientId].analysisStatus = 'complete';
+                localStorage.setItem(PATIENT_DB_KEY, JSON.stringify(patientDB));
+            }
+        } catch (err) {
+            console.error("Failed to update patient status in localStorage:", err);
+        }
       }
 
       // --- Export Visible to CSV ---
       const exportCsvButton = document.querySelector('.btn-secondary-action[href="#"]');
       if (exportCsvButton) {
-        exportCsvButton.addEventListener('click', (e) => {
+        exportCsvButton.addEventListener('click', (e) => { // This logic needs to be updated for cards
           e.preventDefault();
           const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none');
           if (visibleRows.length === 0) {
@@ -833,6 +796,243 @@
       window.exportRecord = function(patientId) {
         alert(`Exporting single record for patient: ${patientId}`);
         // In a real app, this would trigger a download of a single record's data.
+      }
+
+      /**
+       * Sets up and handles the delete confirmation modal.
+       */
+      function setupDeleteModal() {
+          const modal = document.getElementById('delete-confirm-modal');
+          const confirmBtn = document.getElementById('confirm-delete-btn');
+          const cancelBtn = document.getElementById('cancel-delete-btn');
+          const modalContent = document.getElementById('delete-modal-content');
+          let patientIdToDelete = null;
+
+          window.confirmDeletePatient = (patientId, patientName) => {
+              patientIdToDelete = patientId;
+              modalContent.innerHTML = `Are you sure you want to permanently delete the record for <strong>${patientName}</strong> (ID: ${patientId})? This action cannot be undone.`;
+              modal.classList.add('visible');
+          };
+
+          const closeModal = () => modal.classList.remove('visible');
+
+          confirmBtn.addEventListener('click', () => {
+              if (patientIdToDelete) {
+                  const PATIENT_DB_KEY = 'mddaPatientDatabase';
+                  const patientDB = JSON.parse(localStorage.getItem(PATIENT_DB_KEY) || '{}');
+                  delete patientDB[patientIdToDelete];
+                  localStorage.setItem(PATIENT_DB_KEY, JSON.stringify(patientDB));
+                  
+                  // Reload the table to reflect the deletion
+                  loadPatients();
+              }
+              closeModal();
+          });
+
+          cancelBtn.addEventListener('click', closeModal);
+          modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+      }
+      setupDeleteModal();
+
+      /**
+       * If no patient data exists in localStorage, this function populates it
+       * with a default set of demo patients for demonstration purposes.
+       */
+      function initializeDemoData() {
+          const PATIENT_DB_KEY = 'mddaPatientDatabase';
+          const existingDB = localStorage.getItem(PATIENT_DB_KEY);
+
+          if (!existingDB || Object.keys(JSON.parse(existingDB)).length === 0) {
+              console.log("No patient data found. Initializing with demo patients.");
+              const demoPatientData = {
+                  'P-2025-001': {
+                      id: 'P-2025-001', name: 'Sarah Kim', initials: 'SK', age: 54, gender: 'Female', bloodType: 'A+', height: '165 cm', weight: '62 kg',
+                      analysisStatus: 'complete',
+                      diagnosis: {
+                          condition: 'Hepatocellular Carcinoma', details: '5.2cm tumor, Segment VI', date: 'Sept 28, 2025',
+                          affectedOrgan: 'liver',
+                          aiKeyFindings: "This 54-year-old female presents a clinical picture highly indicative of Hepatocellular Carcinoma (HCC). The most significant finding is a markedly elevated Alpha-Fetoprotein (AFP) level of 420 ng/mL, which is a strong tumor marker for HCC. This is corroborated by imaging studies that identify a distinct 5.2cm lesion in segment VI of the liver. Encouragingly, her liver function appears to be well-preserved at this time, as evidenced by normal Albumin and Total Bilirubin levels.",
+                          aiDifferential: "While metastatic disease from another primary cancer is always a consideration for a solitary liver lesion, it is less probable here given the absence of a known primary tumor elsewhere and the strong AFP signal. Benign possibilities such as a hepatic adenoma are also considered highly unlikely in the context of such a high AFP level, which is not typically associated with adenomas.",
+                          aiPrognosis: { risk: "Moderate", color: "orange" },
+                          aiNextSteps: "The immediate priority is to arrange a surgical consultation to evaluate the feasibility of resection, which offers the best curative potential. To aid the surgical planning, a triple-phase CT scan is strongly recommended. This will provide critical details about the lesion's vascularity and its relationship to major blood vessels, which is essential for determining resectability.",
+                          labResults: { 'Alpha-Fetoprotein (AFP)': { value: '420 ng/mL', range: '< 10 ng/mL', status: 'High', history: [120, 250, 380, 420] }, 'Albumin': { value: '3.8 g/dL', range: '3.5-5.0 g/dL', status: 'Normal' }, 'Total Bilirubin': { value: '1.1 mg/dL', range: '0.3-1.2 mg/dL', status: 'Normal' }, 'ALT': { value: '55 U/L', range: '7-56 U/L', status: 'High', history: [0.8, 0.9, 1.0, 1.1] } },
+                          vitals: { bp: '120/80', heartRate: '72 bpm', temperature: '36.8°C' },
+                          treatment: 'Surgical resection planned',
+                          treatmentPlan: { medications: [ { name: 'Lactulose', dosage: '30ml PO BID', purpose: 'To prevent hepatic encephalopathy' }, { name: 'Vitamin K', dosage: '10mg IV daily', purpose: 'To correct coagulopathy pre-op' } ], consultations: [ { specialty: 'Surgical Oncology', date: 'Oct 15, 2025', status: 'Completed' }, { specialty: 'Anesthesiology', date: 'Oct 18, 2025', status: 'Scheduled' } ], monitoring: ['Weekly LFTs and coagulation profile', 'Monitor for signs of ascites or edema', 'Post-op imaging at 1 and 3 months'] }
+                      }
+                  },
+                  'P-2025-002': {
+                      id: 'P-2025-002', name: 'Robert Martinez', initials: 'RM', age: 67, gender: 'Male', bloodType: 'O-', height: '178 cm', weight: '85 kg',
+                      analysisStatus: 'processing',
+                      diagnosis: {
+                          condition: 'NSCLC (Adenocarcinoma)', details: '2.8cm RUL nodule, Stage IIB', date: 'Oct 02, 2025',
+                          affectedOrgan: 'lung-right',
+                          aiKeyFindings: "The patient, a 67-year-old male, has a confirmed 2.8cm nodule in the right upper lobe, identified via imaging. The diagnosis of Non-Small Cell Lung Cancer (NSCLC), specifically adenocarcinoma, is supported by an elevated Carcinoembryonic Antigen (CEA) level of 15 ng/mL. Additionally, the patient's lab work reveals a mild but notable anemia, indicated by a low hemoglobin level, which may be related to the chronic disease process.",
+                          aiDifferential: "Infectious causes, such as a tuberculoma or a fungal granuloma, can mimic a solitary lung nodule on imaging. However, the presence of an elevated CEA tumor marker significantly raises the suspicion for malignancy and makes these infectious etiologies less likely. The combination of the imaging finding and the specific biomarker profile provides a strong basis for the current diagnosis.",
+                          aiPrognosis: { risk: "High", color: "red" },
+                          aiNextSteps: "It is appropriate to proceed with the planned systemic treatment using a Cisplatin/Pemetrexed chemotherapy regimen. To complete the staging workup and ensure there is no distant disease, a PET scan is highly recommended. This will help confirm that the cancer is confined to the chest. Furthermore, the patient's hemoglobin should be closely monitored, and iron supplementation should be considered to manage the anemia.",
+                          labResults: { 'CEA': { value: '15 ng/mL', range: '< 5 ng/mL', status: 'High', history: [4, 8, 11, 15] }, 'Hemoglobin': { value: '13.1 g/dL', range: '13.5-17.5 g/dL', status: 'Low', history: [14.5, 14.0, 13.5, 13.1] }, 'Creatinine': { value: '1.0 mg/dL', range: '0.7-1.3 mg/dL', status: 'Normal' }, 'LDH': { value: '250 U/L', range: '140-280 U/L', status: 'Normal' } },
+                          vitals: { bp: '135/85', heartRate: '80 bpm', temperature: '37.0°C' },
+                          treatment: 'Chemotherapy (Cisplatin/Pemetrexed)',
+                          treatmentPlan: { medications: [ { name: 'Cisplatin', dosage: '75 mg/m²', purpose: 'Cycle 1 of 4' }, { name: 'Pemetrexed', dosage: '500 mg/m²', purpose: 'Cycle 1 of 4' }, { name: 'Ondansetron', dosage: '8mg PO PRN', purpose: 'For nausea' } ], consultations: [ { specialty: 'Radiation Oncology', date: 'Oct 25, 2025', status: 'Scheduled' } ], monitoring: ['Monitor CBC and renal function before each cycle', 'Follow-up CT scan after 2 cycles to assess response'] }
+                      }
+                  },
+                  'P-2025-003': {
+                      id: 'P-2025-003', name: 'Emily Johnson', initials: 'EJ', age: 42, gender: 'Female', bloodType: 'B+', height: '160 cm', weight: '58 kg',
+                      analysisStatus: 'complete',
+                      diagnosis: {
+                          condition: 'Breast Cancer', details: 'IDC, Grade II, T2N1M0', date: 'Aug 15, 2025',
+                          affectedOrgan: 'breast-left',
+                          aiKeyFindings: "This 42-year-old female has a biopsy-confirmed diagnosis of Invasive Ductal Carcinoma. The tumor's biological profile is favorable, being Estrogen Receptor (ER)-positive and HER2-negative, which opens the door for effective hormone therapy. The elevated CA 15-3 tumor marker is consistent with the tumor burden. The clinical stage, T2N1M0, indicates a localized tumor with involvement of nearby lymph nodes but, crucially, no evidence of distant metastasis.",
+                          aiDifferential: "With a definitive biopsy result, a differential diagnosis is not applicable. The focus shifts entirely from diagnosis to treatment planning based on the established pathology and staging.",
+                          aiPrognosis: { risk: "Low", color: "green" },
+                          aiNextSteps: "The recommended course of action is multi-faceted, beginning with a lumpectomy to remove the tumor, followed by adjuvant radiation to reduce the risk of local recurrence. Given the ER-positive status, initiating hormone therapy (such as Tamoxifen or an Aromatase Inhibitor) is critical. Additionally, offering genetic counseling and considering BRCA1/2 testing would be prudent to assess for hereditary cancer risk.",
+                          labResults: { 'CA 15-3': { value: '45 U/mL', range: '< 30 U/mL', status: 'High', history: [25, 30, 38, 45] }, 'Estrogen Receptor': { value: 'Positive', range: 'N/A', status: 'Positive' }, 'HER2/neu': { value: 'Negative', range: 'N/A', status: 'Negative' }, 'Alkaline Phosphatase': { value: '110 U/L', range: '44-147 U/L', status: 'Normal' } },
+                          vitals: { bp: '118/75', heartRate: '68 bpm', temperature: '36.7°C' },
+                          treatment: 'Lumpectomy followed by radiation and hormone therapy',
+                          treatmentPlan: { medications: [ { name: 'Tamoxifen', dosage: '20mg PO daily', purpose: 'Adjuvant hormone therapy' } ], consultations: [ { specialty: 'Radiation Oncology', date: 'Sep 10, 2025', status: 'Completed' }, { specialty: 'Medical Oncology', date: 'Sep 15, 2025', status: 'Completed' } ], monitoring: ['Annual mammogram', 'Regular follow-up with medical oncology'] }
+                      }
+                  },
+                  'P-2025-004': {
+                      id: 'P-2025-004', name: 'Amira Lee', initials: 'AL', age: 29, gender: 'Female', bloodType: 'AB+', height: '170 cm', weight: '65 kg',
+                      analysisStatus: 'processing',
+                      diagnosis: {
+                          condition: 'Type 1 Diabetes', details: 'HbA1c: 8.2%, Insulin Therapy', date: 'Jan 20, 2024',
+                          affectedOrgan: 'pancreas',
+                          aiKeyFindings: "This 29-year-old female's data points clearly to a diagnosis of Type 1 Diabetes with suboptimal glycemic control. The HbA1c of 8.2% reflects a high average blood sugar over the past three months. The core issue is confirmed by a very low C-Peptide level (0.1 ng/mL), which signifies that her pancreas is producing minimal to no insulin on its own. This is further supported by a high fasting glucose reading of 150 mg/dL.",
+                          aiDifferential: "The possibility of Type 2 Diabetes is effectively ruled out by the C-Peptide result. In Type 2 Diabetes, especially in its earlier stages, C-Peptide levels are often normal or even high as the body tries to overcome insulin resistance. The extremely low level seen here is the classic hallmark of autoimmune beta-cell destruction that defines Type 1 Diabetes.",
+                          aiPrognosis: { risk: "Chronic/Managed", color: "blue" },
+                          aiNextSteps: "To improve management, a consultation with an endocrinologist is strongly recommended to fine-tune her insulin pump settings. The implementation of a continuous glucose monitoring (CGM) system would be a game-changer, providing invaluable real-time data to guide therapy. A referral to a registered dietitian is also crucial to reinforce skills in carbohydrate counting and meal planning.",
+                          labResults: { 'HbA1c': { value: '8.2%', range: '< 5.7%', status: 'High', history: [7.5, 7.8, 8.0, 8.2] }, 'Fasting Glucose': { value: '150 mg/dL', range: '70-100 mg/dL', status: 'High', history: [130, 145, 140, 150] }, 'C-Peptide': { value: '0.1 ng/mL', range: '0.5-2.0 ng/mL', status: 'Low', history: [0.3, 0.2, 0.1, 0.1] }, 'GAD Antibodies': { value: 'Positive', range: 'Negative', status: 'High' } },
+                          vitals: { bp: '110/70', heartRate: '75 bpm', temperature: '36.9°C' },
+                          treatment: 'Insulin pump therapy and continuous glucose monitoring',
+                          treatmentPlan: { medications: [ { name: 'Insulin Aspart', dosage: 'Via pump, variable', purpose: 'Basal and bolus insulin' } ], consultations: [ { specialty: 'Endocrinologist', date: 'Nov 05, 2024', status: 'Scheduled' }, { specialty: 'Registered Dietitian', date: 'Nov 12, 2024', status: 'Scheduled' } ], monitoring: ['Review CGM data weekly', 'Quarterly HbA1c checks', 'Annual kidney and eye screening'] }
+                      }
+                  },
+                  'P-2025-005': {
+                      id: 'P-2025-005', name: 'Jasper Singh', initials: 'JS', age: 36, gender: 'Male', bloodType: 'O+', height: '182 cm', weight: '78 kg',
+                      analysisStatus: 'complete',
+                      diagnosis: {
+                          condition: 'Asthma', details: 'Mild persistent, Inhaler therapy', date: 'Mar 10, 2023',
+                          affectedOrgan: 'lungs',
+                          aiKeyFindings: "This patient has an established diagnosis of mild persistent asthma that appears to be well-managed. His baseline lung function is good, with an FEV1 within the normal predicted range. The normal eosinophil count suggests that his asthma is either non-allergic in nature or that any allergic component is being effectively controlled by his current medication. Most importantly, the patient's self-reported symptom control is effective.",
+                          aiDifferential: "As this is a long-standing and stable diagnosis, a differential diagnosis is not currently warranted. The clinical picture is entirely consistent with well-controlled asthma.",
+                          aiPrognosis: { risk: "Very Low", color: "green" },
+                          aiNextSteps: "The primary recommendation is to continue the current successful treatment plan. It is important to reinforce the patient's understanding of the need for consistent daily use of his Fluticasone inhaler to manage underlying inflammation, rather than relying solely on the rescue inhaler. Providing him with an updated, clear Asthma Action Plan for how to handle any potential flare-ups is also advised.",
+                          labResults: { 'FEV1': { value: '85% predicted', range: '>80% predicted', status: 'Normal' }, 'Eosinophils': { value: '250 cells/mcL', range: '< 500 cells/mcL', status: 'Normal' }, 'Total IgE': { value: '120 IU/mL', range: '< 100 IU/mL', status: 'High' } },
+                          vitals: { bp: '125/80', heartRate: '65 bpm', temperature: '36.6°C' },
+                          treatment: 'Albuterol inhaler (as needed), Fluticasone (daily)',
+                          treatmentPlan: { medications: [ { name: 'Fluticasone', dosage: '1 puff BID', purpose: 'Controller medication' }, { name: 'Albuterol', dosage: '2 puffs PRN', purpose: 'Rescue medication' } ], consultations: [ { specialty: 'Pulmonology', date: 'Mar 10, 2024', status: 'Completed' } ], monitoring: ['Annual spirometry testing', 'Review inhaler technique at each visit'] }
+                      }
+                  },
+                  'P-2025-006': {
+                      id: 'P-2025-006', name: 'Maria Blanco', initials: 'MB', age: 61, gender: 'Female', bloodType: 'A-', height: '155 cm', weight: '70 kg',
+                      analysisStatus: 'processing',
+                      diagnosis: {
+                          condition: 'Chronic Kidney Disease', details: 'Stage 3, eGFR: 45', date: 'Jul 22, 2025',
+                          affectedOrgan: 'kidneys',
+                          aiKeyFindings: "This 61-year-old female's lab results indicate Stage 3 Chronic Kidney Disease (CKD). This is defined by her estimated Glomerular Filtration Rate (eGFR) of 45 mL/min/1.73m². The diagnosis is further substantiated by elevated levels of Serum Creatinine and BUN, both of which confirm reduced kidney function. Her co-existing hypertension (140/90 mmHg) is significant, as it is both a potential cause and a consequence of her kidney disease.",
+                          aiDifferential: "The diagnosis points towards a chronic process. While an Acute Kidney Injury (AKI) is a possibility, it is less likely given the context. To be certain, a review of her historical creatinine levels is recommended to confirm a gradual decline in function over time, which is characteristic of CKD rather than a sudden drop seen in AKI.",
+                          aiPrognosis: { risk: "Moderate", color: "orange" },
+                          aiNextSteps: "Management should focus on slowing disease progression. It is crucial to continue Lisinopril, as it provides both blood pressure control and a protective effect on the kidneys. A referral to a renal dietitian is essential for counseling on a diet low in sodium and potassium. The patient must be educated to strictly avoid NSAIDs, which can further harm the kidneys. A follow-up lab panel in 3 months is necessary to monitor the eGFR trend.",
+                          labResults: { 'eGFR': { value: '45 mL/min/1.73m²', range: '>90', status: 'Low', history: [55, 50, 48, 45] }, 'Serum Creatinine': { value: '1.5 mg/dL', range: '0.6-1.1 mg/dL', status: 'High', history: [1.2, 1.3, 1.4, 1.5] }, 'BUN': { value: '25 mg/dL', range: '7-20 mg/dL', status: 'High', history: [20, 22, 24, 25] }, 'UACR': { value: '50 mg/g', range: '< 30 mg/g', status: 'High' } },
+                          vitals: { bp: '140/90', heartRate: '78 bpm', temperature: '36.8°C' },
+                          treatment: 'Lisinopril for blood pressure control, dietary restrictions',
+                          treatmentPlan: { medications: [ { name: 'Lisinopril', dosage: '20mg PO daily', purpose: 'Blood pressure & renal protection' }, { name: 'Atorvastatin', dosage: '40mg PO daily', purpose: 'Cardiovascular risk reduction' } ], consultations: [ { specialty: 'Nephrology', date: 'Oct 20, 2025', status: 'Scheduled' }, { specialty: 'Renal Dietitian', date: 'Aug 10, 2025', status: 'Completed' } ], monitoring: ['Monitor eGFR and electrolytes every 3 months', 'Maintain BP < 130/80 mmHg'] }
+                      }
+                  },
+                  'P-2025-007': {
+                      id: 'P-2025-007', name: 'David Chen', initials: 'DC', age: 48, gender: 'Male', bloodType: 'B-', height: '175 cm', weight: '72 kg',
+                      analysisStatus: 'complete',
+                      diagnosis: {
+                          condition: 'Glioblastoma', details: '4.5cm mass in left temporal lobe', date: 'Oct 18, 2025',
+                          affectedOrgan: 'brain',
+                          aiKeyFindings: "A 48-year-old male presents with a 4.5cm ring-enhancing mass in the left temporal lobe, identified on contrast-enhanced MRI. The imaging characteristics are highly suggestive of a high-grade glioma, most likely Glioblastoma (GBM). The patient's recent onset of seizures and headaches aligns with the location and size of the lesion. Lab work is largely unremarkable, which is common in primary brain tumors.",
+                          aiDifferential: "While the primary differential is Glioblastoma, other possibilities include a solitary brain metastasis from an unknown primary cancer or, less likely, a primary CNS lymphoma. However, the ring-enhancement and surrounding edema on MRI strongly favor GBM. An abscess is also a remote possibility but is less likely without signs of systemic infection.",
+                          aiPrognosis: { risk: "High", color: "red" },
+                          aiNextSteps: "Immediate neurosurgical consultation is paramount for biopsy and maximal safe resection of the tumor. Post-operative chemoradiation with temozolomide is the standard of care and should be planned. Genetic analysis of the tumor tissue for MGMT promoter methylation status is critical for prognostic and treatment planning.",
+                          labResults: { 'CBC': { value: 'Normal', range: 'N/A', status: 'Normal' }, 'CMP': { value: 'Normal', range: 'N/A', status: 'Normal' }, 'GFAP': { value: 'Elevated', range: 'N/A', status: 'High', history: [1,1,1,1] }, 'CRP': { value: '0.5 mg/L', range: '< 3.0 mg/L', status: 'Normal' } },
+                          vitals: { bp: '130/85', heartRate: '70 bpm', temperature: '37.1°C' },
+                          treatment: 'Surgical Resection + Chemoradiation',
+                          treatmentPlan: { medications: [ { name: 'Dexamethasone', dosage: '4mg PO QID', purpose: 'To reduce cerebral edema' }, { name: 'Levetiracetam', dosage: '500mg PO BID', purpose: 'Seizure prophylaxis' } ], consultations: [ { specialty: 'Neurosurgery', date: 'Oct 19, 2025', status: 'Completed' }, { specialty: 'Neuro-Oncology', date: 'Oct 22, 2025', status: 'Scheduled' } ], monitoring: ['Weekly CBC during chemotherapy', 'MRI brain every 2 months post-treatment'] }
+                      }
+                  },
+              };
+              localStorage.setItem(PATIENT_DB_KEY, JSON.stringify(demoPatientData));
+          }
+      }
+
+      /**
+       * Loads patients from localStorage and populates the table.
+       */
+      function loadPatients() {
+          initializeDemoData(); // Check for and load demo data if needed
+          const PATIENT_DB_KEY = 'mddaPatientDatabase';
+          const patientDB = JSON.parse(localStorage.getItem(PATIENT_DB_KEY) || '{}');
+          const grid = document.getElementById('patient-grid');
+          grid.innerHTML = ''; // Clear existing cards
+
+          if (Object.keys(patientDB).length === 0) {
+              grid.innerHTML = '<p class="text-center p-8 text-gray-500 col-span-full">No patients found. Please add a new patient.</p>';
+              return;
+          }
+
+          Object.values(patientDB).forEach((patient, index) => {
+              const row = document.createElement('tr');
+              row.dataset.status = patient.analysisStatus === 'complete' ? 'Dashboard Ready' : 'Processing';
+              row.classList.add('animate-row');
+              row.style.animationDelay = `${(index + 1) * 0.1}s`;
+
+              const isReady = patient.analysisStatus === 'complete';
+              const statusBadge = isReady 
+                  ? '<span class="status-badge status-ready">Analysis Complete</span>'
+                  : '<span class="status-badge status-processing">Processing</span>';
+              
+              const actionButtons = isReady
+                  ? `<a href="dashboard_new.html?id=${patient.id}" class="table-action-button btn-primary-action">Report</a>
+                     <button class="table-action-button btn-secondary-action" onclick="exportRecord('${patient.id}')">Export</button>
+                     <button class="table-action-button btn-delete-action" onclick="confirmDeletePatient('${patient.id}', '${patient.name}')">Delete</button>`
+                  : `<button class="table-action-button btn-toggle-status" onclick="toggleStatus(this)">Mark Ready</button>
+                     <a href="dashboard_new.html?id=${patient.id}" class="table-action-button btn-primary-action" style="display: none;">Report</a>
+                     <button class="table-action-button btn-delete-action" onclick="confirmDeletePatient('${patient.id}', '${patient.name}')">Delete</button>`;
+
+              const card = document.createElement('div');
+              card.className = 'patient-card animate-row';
+              card.style.animationDelay = `${index * 0.05}s`;
+              card.dataset.status = patient.analysisStatus === 'complete' ? 'Dashboard Ready' : 'Processing';
+              card.dataset.patientId = patient.id;
+              card.dataset.patientName = patient.name;
+              card.dataset.age = patient.age;
+              card.dataset.diagnosis = patient.diagnosis.condition;
+
+              card.innerHTML = `
+                <div class="card-header">
+                    <div class="avatar" style="background: linear-gradient(135deg, #60a5fa, #3b82f6)">${patient.initials}</div>
+                    <div class="flex-grow">
+                        <h3 class="font-bold text-lg searchable" data-original-text="${patient.name}">${patient.name}</h3>
+                        <p class="text-sm text-gray-500 searchable" data-original-text="${patient.id}">${patient.id}</p>
+                    </div>
+                    ${statusBadge}
+                </div>
+                <div class="flex-grow space-y-3 my-4">
+                    <div class="text-sm"><strong class="text-gray-500 w-16 inline-block">Age:</strong> ${patient.age}</div>
+                    <div>
+                        <strong class="text-gray-500 text-sm block mb-1">Diagnosis:</strong>
+                        <div class="diagnosis-cell searchable" data-original-text="${patient.diagnosis.condition} ${patient.diagnosis.details}">
+                            <strong>${patient.diagnosis.condition}</strong>
+                            <span class="diagnosis-details">${patient.diagnosis.details}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer mt-auto pt-4 border-t border-gray-200">
+                    <div class="action-buttons">${actionButtons}</div>
+                </div>
+              `;
+              grid.appendChild(card);
+          });
+
+          // Re-initialize the 'patientCards' array for filtering and sorting
+          patientCards = Array.from(document.querySelectorAll(".patient-card"));
       }
     });
   </script>
