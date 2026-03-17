@@ -1,2 +1,2 @@
 # Diagnostic-Assistant
-AI powerd medical assistant
+AI powered medical assistant
